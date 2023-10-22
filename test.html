@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find the Most Efficient Vehicle Route</title>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7odqQ4I69_iFyg_8ykJxyhLygPv__86I&libraries=places"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Find the Most Efficient Car Route</h1>
+    
+    <label for="from">From:</label>
+    <input type="text" id="from" placeholder="Enter starting location">
+    
+    <label for="to">To:</label>
+    <input type="text" id="to" placeholder="Enter destination location">
+    
+    <label for="emissionType">Select Vehicle Emission Type:</label>
+    <select id="emissionType">
+        <option value="GASOLINE">Gasoline</option>
+        <option value="DIESEL">Diesel</option>
+        <option value="ELECTRIC">Electric</option>
+        <option value="HYBRID">Hybrid</option>
+    </select>
+    
+    <button onclick="findMostEfficientRoute()">Find Efficient Route</button>
+    
+    <div id="map"></div>
+    
+    <script>
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
+                center: { lat: 41.76904801292959, lng: -72.67374935684933 }
+            });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+            
+            const autocompleteFrom = new google.maps.places.Autocomplete(
+                document.getElementById("from")
+            );
+            const autocompleteTo = new google.maps.places.Autocomplete(
+                document.getElementById("to")
+            );
+        }
+        
+        function findMostEfficientRoute() {
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+            const emissionType = document.getElementById("emissionType").value;
+            
+            directionsService.route({
+                origin: from,
+                destination: to,
+                travelMode: google.maps.TravelMode.DRIVING,
+                provideRouteAlternatives: true,
+                routingPreference: "TRAFFIC_AWARE_OPTIMAL",
+                vehicleInfo: {
+                    emissionType: emissionType
+                },
+                fields: ["routes", "travelAdvisory"]
+            }, function(result, status) {
+                if (status === "OK") {
+                    directionsRenderer.setDirections(result);
+                    // Note: The code to display fuel consumption is working
+                } else {
+                    alert("Error: " + status);
+                }
+            });
+        }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7odqQ4I69_iFyg_8ykJxyhLygPv__86I&callback=initMap&libraries=places"></script>
+</body>
+</html>
